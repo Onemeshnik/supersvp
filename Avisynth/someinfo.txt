@@ -1,1 +1,1 @@
-{scale:{up:0},gpu:1,pel:1,full:false}{block:{w:32,overlap:0},main:{search:{coarse:{type:0,width:530,satd:false,bad:{range:0}},type:2}},refine:[{search:{}}]}{rate:{num:25026,den:10000},algo:13,mask:{},scene:{mode:3,limits:{m1:0,m2:0}}}
+{scale:{up:2},gpu:0,pel:1,full:false}{block:{},main:{search:{coarse:{type:4,distance:-12,bad:{sad:2000}},type:4}},refine:[{search:{}}]}{rate:{num:24000,den:10000},algo:13,mask:{area:50},scene:{mode:3,limits:{m1:0}}}

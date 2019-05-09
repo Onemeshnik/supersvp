@@ -1,8 +1,8 @@
 # SuperSVP support vk.com/potplayerms t.me/supersvp
 Try{ Core=Core }catch(err){ 
 FPS= 36 			GPU= 0		MaskArtefact = 0		#FPS: 1..10 - 1..10X,>10 - target FPS. You can proportionally (targeFPS-originalFPS) decrease CPU load reducing this value. GPU 0 - off | 1(11) - 1st GPU on 1st platform | 12 - 2nd GPU on 1st platform | 21 - 1st GPU on 2nd platform...
-Radius= 3 		BADLev= Radius 	BlockSize = 0		#0-3  0-weakest, 3 - best. As I know, usually in original SVP BADLev=Radius , but you can control it manually #MaskArtefact 0 - default, 50 - middle, 200 - strong. Bigger values gives less smoothing; BlockSize 0-8, 0-w32, ol0; 1-w32,ol1; 2-w32; 3-ol; 4-ol1; 5-default 16,ol2; 6-w8,ol0; 7-w8,ol1; 8-w8 . Bigger block faster and less noisy, but small have better smooth.
-Pel= 1			Thsad= 66		Mode= 4			#pel 2 is default, higher is slower. The accuracy of the motion estimation. 1 means a precision to the pixel, 2 means a precision to half a pixel, 4 - to quarter pixel (not recommended to use). But Pel=1 is Okay #thsad:200, default, 250 for better quality, 1000 for smooth animation, 65000 for... I do not know, but it used some time ago. Zero means "do not refine, just divide" #mode 1 - каждый ориг кадр используется один раз, остальное - расчётные кадры, 0 - из двух ориг кадров остаётся один, остальные расчётные (объясните, ЗАЧЕМ?! Ведь рассчётные хуже и доп нагрузка на ЦПУ), 2 - каждый ориг кадр дублируется (ЗАЧЕМ?! На выходе фейк уплавнение, нагрузка на ГПУ сильно возрастёт),  3 - по ситуации (дефолт), грузит ЦПУ примерно как 0. Я понимаю, что в сложных сценах может быть оправдан переход в 2 режим, но зачем он торчит в нулевом?! 	
+Radius= 1 		BADLev= Radius 	BlockSize = 0		#0-3  0-weakest, 3 - best. As I know, usually in original SVP BADLev=Radius , but you can control it manually #MaskArtefact 0 - default, 50 - middle, 200 - strong. Bigger values gives less smoothing; BlockSize 0-8, 0-w32, ol0; 1-w32,ol1; 2-w32; 3-ol; 4-ol1; 5-default 16,ol2; 6-w8,ol0; 7-w8,ol1; 8-w8 . Bigger block faster and less noisy, but small have better smooth.
+Pel= 1			Thsad= 66		Mode= 1			#pel 2 is default, higher is slower. The accuracy of the motion estimation. 1 means a precision to the pixel, 2 means a precision to half a pixel, 4 - to quarter pixel (not recommended to use). But Pel=1 is Okay #thsad:200, default, 250 for better quality, 1000 for smooth animation, 65000 for... I do not know, but it used some time ago. Zero means "do not refine, just divide" #mode 1 - каждый ориг кадр используется один раз, остальное - расчётные кадры, 0 - из двух ориг кадров остаётся один, остальные расчётные (объясните, ЗАЧЕМ?! Ведь рассчётные хуже и доп нагрузка на ЦПУ), 2 - каждый ориг кадр дублируется (ЗАЧЕМ?! На выходе фейк уплавнение, нагрузка на ГПУ сильно возрастёт),  3 - по ситуации (дефолт), грузит ЦПУ примерно как 0. Я понимаю, что в сложных сценах может быть оправдан переход в 2 режим, но зачем он торчит в нулевом?! 	
 CoarseWidth= 66		WeakGPU= 0	SearchDistance= 66  	#default 1050, higher is slower #WeakGPU if your GPU is overload, 1 means linear:false, 2 - cubic:0; 3 - cubic:0,linear:false . In modern version if SVP decides thay you have weak GPU, it paste only linear:false. Cubic:0 is for previous versions #SearchDistance:0 speeds up, but can looks good on GPU. Developers do not use it in script generator
 CoarseType=66		SearchType=2
 Algo= 13			Tthreads = 66	 			#13  algo for movies, 2 for animation. There is other algos, but they works bad, imho
@@ -28,7 +28,7 @@ potplayer_source()
 #ConvertToYV12()
 """)}
 
-WTF2=FontColor<$10000? "menwe" : "bolwe"
+#WTF2=FontColor<$10000? "menwe" : "bolwe"
 UseCoarseW= CoarseWidth==66? "" : "width:"+String(CoarseWidth)+","
 UseSearchDistance= SearchDistance==66? "" : "distance:"+String(SearchDistance)+"," 
 UseCoarseType= CoarseType==66? "" : "type:"+String(CoarseType)+"," 
@@ -138,7 +138,7 @@ global super_params     = Super_Override=="" ? "{"+gpuparams+","+pelparams+"}" :
 part1="{"+AnalyseBlock+"main:{search:{"+UseSearchDistance+"coarse:{"+UseCoarseType+""+UseCoarseW+""+AnalyseMainSearchCoarse+""
 part2="bad:{"+AnalyseMainBADLev+"}},type:"+String(SearchType)+"}},refine:[{"+UseThsad+"search:{}}]}"
 global analyse_params = Analyse_Override == "" ? ""+part1+""+part2+"" :  Analyse_Override
-usemode= mode==4 ? "3,limits:{m1:0,m2:0}" : mode
+usemode= mode==4 ? "3,limits:{m1:0,m2:0}" : mode==5? "3,limits:{m1:0}" : mode
 global smoothFPS_params = SmoothFPS_Override=="" ? "{"+weakgpuparam+"rate:{"+rate+"},"+gpuid+"algo:"+String(algo)+",mask:{"+String(UseMaskArtefact)+"},scene:{mode:"+String(usemode)+"}}" : SmoothFPS_Override
 
 global demo_Mode=0
@@ -207,7 +207,7 @@ Subtitle( \
  ""+String(source_width)+"x"+String(source_height)+" "+String(SourceAspect)+" "+String(origframerate)+"*"+String(float(num)/denum)+"="+String(targetframerate)+"("+String(FPS)+") "+override+"\n" + \   
  "Radius:"+String(Radius)+"/3, BADLev:"+String(BADLev)+"/3\n" + \  
  "MaskArtefact:"+String(MaskArtefact)+", Block:"+String(BlockSize)+"/8 "+BlockSizePx+"px\n" + \  
- "GPU:"+String(gpu)+", Mode:"+String(mode)+"/4\n" + \  
+ "GPU:"+String(gpu)+", Mode:"+String(mode)+"/5\n" + \  
  "Pel:"+String(pel)+"/4, Threads:"+String(threads)+"\n" + \  
  "WeakGPU:"+String(weakgpu)+"/3, CoarseWidth:"+String(CoarseWidth)+" SearchDistance:"+String(SearchDistance)+"\n" + \
  "OSD:"+String(OSD)+"sec, OSDframes:"+String(OSDtime)+"\n" , \
@@ -223,7 +223,7 @@ Subtitle( \
   ""+smoothFPS_params+"\n", \
          font=Font, size=fontsize, text_color=FontColor, spc=2, y= height-9*fontsize, lsp=10, last_frame = OSDtime )
 Subtitle( \
-  "SuperSVP 190501\n" + \
+  "SuperSVP 190509\n" + \
   "vk.com/potplayerms t.me/supersvp \n", \
          font=Font, size=fontsize*1.2, text_color=FontColor, spc=2, y= height-2*fontsize, lsp=10, align=3, last_frame = OSDtime )
 """) : ("")
@@ -231,6 +231,13 @@ Space=""+chr(13)+""
 WriteFileStart("someinfo.txt", "super_params", "Space", "analyse_params", "Space", "smoothFPS_params")
 Prefetch(threads)
 /*
+190509
+Добавлен mode5, что должно означать, что СВП работает в режиме использования 1 кадра (он не будет исключать реальные кадры, как по умолчанию), но при недостаточно хороших результатах должен переходить в m2 режим (как обычно). Режим используется по умолчанию, кроме 00 презета
+Сделан базовый инсталлятор avisynth+, интеграция с реестром для отсылания скрипта в FFDSHOW X86 или X64. Надо учесть, что скрипт можно послать только когда ffdshow неактивен.
+
+190506
+Подгонка презетов и небольшие доработки
+
 190505
 Добавлен mode 4, что эквивалентно mode 1.5 в офиц версии СВП. Я точно не могу сказать, как это работает, но по идее это должно переключать режимы между 1 и 2 в зависимости от ситуации. Данный режим не вызывает повышения нагрузки на ЦП и в ряде случаев (вроде бы) ниже. Плюс данный режим застраховывает от возможной кривости mode:1. Я сделал этот режим по умолчанию, может чем-то поможет
 Изменена политика потоков ЦП, в режиме ГПУ=0 потоки равны кол-ву ядер процессора+1
