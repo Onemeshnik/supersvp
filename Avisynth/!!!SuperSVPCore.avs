@@ -128,7 +128,7 @@ gpuparams = gpu>0 ? "scale:{up:0},gpu:1" : "scale:{up:2},gpu:0"
 #OverrideRes==1?eval(""" """)
 #MultiplerW>MultiplerH? cropstring="width/MultiplerW,height/MultiplerH,c=0.75":cropstring=""
 UseThsad=Thsad==66?"":"thsad:"+String(Thsad)+","
-UseMaskArtefact=MaskArtefact==0? "" : "area:"+String(round(MaskArtefact*10))+""
+UseMaskArtefact=MaskArtefact==0? "" : "area:"+String(MaskArtefact)+""
 global source_width = width
 global source_height = height
 global crop_string  = ""
